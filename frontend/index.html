@@ -3,52 +3,186 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HireLens — Resume Parser &amp; Evaluator</title>
+  <title>HireLens — AI resume ranking for hiring teams</title>
+  <meta name="description" content="Upload resumes, add a job description, and get an AI-ranked shortlist in minutes." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <h1>HireLens</h1>
-    <p>Upload resumes, get an AI-ranked shortlist against your job description.</p>
+
+  <div class="glow glow-hero" aria-hidden="true"></div>
+
+  <header class="navbar">
+    <div class="container navbar-layout">
+      <a href="#" class="brand" aria-label="HireLens home">
+        <span class="brand-mark">◆</span> HireLens
+      </a>
+      <nav class="nav-links">
+        <a href="#audience" class="nav-link">Who it's for</a>
+        <a href="#capabilities" class="nav-link">How it works</a>
+        <a href="#tool" class="nav-link">Evaluate</a>
+      </nav>
+      <a href="#tool" class="button"><span class="button-text">Rank resumes</span></a>
+    </div>
   </header>
 
   <main>
-    <section class="card">
-      <h2>1. Job Description</h2>
-      <textarea id="jobDescription" rows="8" placeholder="Paste a job description here... (leave empty to use the built-in default)"></textarea>
-      <div class="jd-or">
-        <span>or upload a JD file instead</span>
-        <label class="file-btn" for="jdFile">Choose PDF / DOC</label>
-        <input type="file" id="jdFile" accept=".pdf,.docx" hidden />
-        <span id="jdFileName" class="jd-file-name"></span>
+
+    <!-- Hero -->
+    <section class="section cover-section">
+      <div class="container">
+        <h1 class="cover-heading reveal">Stop reading every resume. <span class="heading-span">Let the shortlist build itself.</span></h1>
+        <div class="cover-actions reveal">
+          <a href="#tool" class="button button-big"><span class="button-text big-button">Rank resumes now</span></a>
+        </div>
+        <div class="cover-description reveal">
+          <div>You know how great candidates get buried under hundreds of near-identical applications?</div>
+          <div>HireLens parses every resume, scores it against your job description, and hands you the best N — in minutes, not days.</div>
+        </div>
       </div>
     </section>
 
-    <section class="card">
-      <h2>2. Resumes</h2>
-      <label id="dropZone" for="resumeFiles">
-        <span>Click to select or drop PDF / DOCX files here</span>
-        <input type="file" id="resumeFiles" multiple accept=".pdf,.docx" hidden />
-      </label>
-      <ul id="fileList"></ul>
-    </section>
-
-    <section class="card">
-      <h2>3. Evaluate</h2>
-      <div class="controls">
-        <label for="topN">Show top</label>
-        <input type="number" id="topN" min="1" value="2" />
-        <span>candidates</span>
-        <button id="evaluateBtn">Evaluate</button>
+    <!-- Audience -->
+    <section class="section" id="audience">
+      <div class="container about-layout">
+        <div class="about-heading-box">
+          <p class="caption-text reveal">Who HireLens is best for.</p>
+          <h2 class="reveal">Built for everyone <span class="heading-span">touching the hiring funnel.</span></h2>
+          <div class="glow glow-small" aria-hidden="true"></div>
+        </div>
+        <div class="about-items-box">
+          <div class="about-item reveal">
+            <span class="about-item-icon">◆</span>
+            <div>HR teams <span class="text-color-grey">screening high volumes of applications who need a defensible, consistent first pass.</span></div>
+          </div>
+          <div class="about-item reveal">
+            <span class="about-item-icon">■</span>
+            <div>Recruiters <span class="text-color-grey">who want a ranked shortlist before the first outreach, not after ten manual reviews.</span></div>
+          </div>
+          <div class="about-item reveal">
+            <span class="about-item-icon">▲</span>
+            <div>Hiring managers <span class="text-color-grey">who should spend their time interviewing fits, not skimming PDFs.</span></div>
+          </div>
+          <div class="about-item reveal">
+            <span class="about-item-icon">●</span>
+            <div>Founders &amp; small teams <span class="text-color-grey">hiring without a dedicated TA function, who need signal fast.</span></div>
+          </div>
+        </div>
       </div>
-      <p id="status" class="status" hidden></p>
     </section>
 
-    <section class="card" id="resultsCard" hidden>
-      <h2>Results</h2>
-      <div id="results"></div>
+    <!-- Capabilities -->
+    <section class="section offer-section" id="capabilities">
+      <div class="container">
+        <p class="caption-text reveal">How things will go. Short &amp; sweet.</p>
+        <h2 class="reveal">What HireLens <span class="heading-span">does with your pipeline.</span></h2>
+        <div class="offer-cards-grid">
+          <div class="offer-card reveal">
+            <span class="offer-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4m0 0L7 9m5-5 5 5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            </span>
+            <div class="offer-card-content">
+              <div>Upload resumes.</div>
+              <div class="text-color-grey">Drop a batch of PDF or DOCX resumes. Every file is read and structured automatically — no manual data entry.</div>
+            </div>
+          </div>
+          <div class="offer-card reveal">
+            <span class="offer-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+            </span>
+            <div class="offer-card-content">
+              <div>Add the job description.</div>
+              <div class="text-color-grey">Paste the JD as text or upload it as a PDF/DOC. HireLens extracts the required skills, responsibilities and level.</div>
+            </div>
+          </div>
+          <div class="offer-card reveal">
+            <span class="offer-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.6 5.6l1.4 1.4m10 10 1.4 1.4m0-12.8-1.4 1.4m-10 10-1.4 1.4"/><circle cx="12" cy="12" r="4"/></svg>
+            </span>
+            <div class="offer-card-content">
+              <div>AI scoring.</div>
+              <div class="text-color-grey">Each resume is compared to the JD like an HR recruiter would — skills, experience, education — and given a 0–100 match score.</div>
+            </div>
+          </div>
+          <div class="offer-card reveal">
+            <span class="offer-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </span>
+            <div class="offer-card-content">
+              <div>Get your shortlist.</div>
+              <div class="text-color-grey">See the top N candidates ranked, with matching skills, missing skills and a plain-English verdict for each.</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <!-- Tool -->
+    <section class="section tool-section" id="tool">
+      <div class="container">
+        <p class="caption-text reveal">Try it now.</p>
+        <h2 class="reveal">Rank your next <span class="heading-span">batch of candidates.</span></h2>
+
+        <div class="tool-grid">
+          <section class="card reveal">
+            <span class="step-number">1</span>
+            <h3>Job description</h3>
+            <textarea id="jobDescription" rows="9" placeholder="Paste a job description here... (leave empty to use the built-in default)"></textarea>
+            <div class="jd-or">
+              <span>or upload a JD file instead</span>
+              <label class="file-btn" for="jdFile">Choose PDF / DOC</label>
+              <input type="file" id="jdFile" accept=".pdf,.docx" hidden />
+              <span id="jdFileName" class="jd-file-name"></span>
+            </div>
+          </section>
+
+          <section class="card reveal">
+            <span class="step-number">2</span>
+            <h3>Resumes</h3>
+            <label id="dropZone" for="resumeFiles">
+              <span class="dropzone-title">Click to select or drop PDF / DOCX files here</span>
+              <span class="dropzone-hint">Multiple files welcome</span>
+              <input type="file" id="resumeFiles" multiple accept=".pdf,.docx" hidden />
+            </label>
+            <ul id="fileList"></ul>
+          </section>
+
+          <section class="card reveal">
+            <span class="step-number">3</span>
+            <h3>Evaluate</h3>
+            <div class="controls">
+              <label for="topN">Show top</label>
+              <input type="number" id="topN" min="1" value="2" />
+              <span>candidates</span>
+            </div>
+            <button id="evaluateBtn" class="button button-dark evaluate-btn">
+              <span class="button-text big-button">Evaluate candidates</span>
+            </button>
+            <p id="status" class="status" hidden></p>
+          </section>
+        </div>
+
+        <section class="card results-card reveal" id="resultsCard" hidden>
+          <div class="results-head">
+            <span class="caption-text">Your shortlist</span>
+            <h3>Top candidates</h3>
+          </div>
+          <div id="results"></div>
+        </section>
+      </div>
+    </section>
+
   </main>
+
+  <footer class="footer">
+    <div class="container footer-layout">
+      <div class="brand"><span class="brand-mark">◆</span> HireLens</div>
+      <div class="text-color-grey">AI resume parsing &amp; evaluation — one shared key, rate-limited, no sign-up.</div>
+      <div class="caption-text">2026</div>
+    </div>
+  </footer>
 
   <script src="app.js"></script>
 </body>
