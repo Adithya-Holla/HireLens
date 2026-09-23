@@ -1,0 +1,222 @@
+:root {
+  --bg: #0f1420;
+  --card: #1a2233;
+  --border: #2c3850;
+  --text: #e8edf7;
+  --muted: #93a0b8;
+  --accent: #4f8cff;
+  --accent-hover: #6ba0ff;
+  --good: #35c46f;
+  --bad: #e05260;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header {
+  padding: 2rem 1.5rem 1rem;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+header p {
+  color: var(--muted);
+  margin: 0.5rem 0 0;
+}
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+}
+
+.card h2 {
+  margin: 0 0 0.9rem;
+  font-size: 1.05rem;
+  color: var(--accent);
+}
+
+textarea,
+input[type="number"] {
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  resize: vertical;
+}
+
+input[type="number"] {
+  width: 5rem;
+}
+
+textarea:focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+#dropZone {
+  display: block;
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 1.6rem;
+  text-align: center;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+#dropZone:hover,
+#dropZone.dragover {
+  border-color: var(--accent);
+  background: rgba(79, 140, 255, 0.08);
+  color: var(--text);
+}
+
+#fileList {
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+#fileList li {
+  padding: 0.2rem 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+button {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.6rem;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+button:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.status {
+  margin: 1rem 0 0;
+  color: var(--muted);
+}
+
+.status.error {
+  color: var(--bad);
+}
+
+.candidate {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.candidate .head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.candidate .name {
+  font-weight: 600;
+}
+
+.candidate .score {
+  color: var(--good);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.score-bar {
+  height: 8px;
+  background: var(--bg);
+  border-radius: 4px;
+  margin: 0.6rem 0;
+  overflow: hidden;
+}
+
+.score-bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--good));
+}
+
+.verdict {
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.chip {
+  font-size: 0.8rem;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--border);
+}
+
+.chip.match {
+  color: var(--good);
+  border-color: var(--good);
+}
+
+.chip.missing {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+
+.errors {
+  color: var(--bad);
+  font-size: 0.9rem;
+}

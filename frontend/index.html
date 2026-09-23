@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HireLens — Resume Parser &amp; Evaluator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>HireLens</h1>
+    <p>Upload resumes, get an AI-ranked shortlist against your job description.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>1. Job Description</h2>
+      <textarea id="jobDescription" rows="8" placeholder="Paste a job description here... (leave empty to use the built-in default)"></textarea>
+    </section>
+
+    <section class="card">
+      <h2>2. Resumes</h2>
+      <label id="dropZone" for="resumeFiles">
+        <span>Click to select or drop PDF / DOCX files here</span>
+        <input type="file" id="resumeFiles" multiple accept=".pdf,.docx" hidden />
+      </label>
+      <ul id="fileList"></ul>
+    </section>
+
+    <section class="card">
+      <h2>3. Evaluate</h2>
+      <div class="controls">
+        <label for="topN">Show top</label>
+        <input type="number" id="topN" min="1" value="2" />
+        <span>candidates</span>
+        <button id="evaluateBtn">Evaluate</button>
+      </div>
+      <p id="status" class="status" hidden></p>
+    </section>
+
+    <section class="card" id="resultsCard" hidden>
+      <h2>Results</h2>
+      <div id="results"></div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
