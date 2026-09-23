@@ -43,6 +43,9 @@ Create a `.env` file in the project root:
 GROQ_API_KEY=your_key_here
 ```
 
+> **Note:** The API key lives only on the server. The browser talks to `/api/*` endpoints
+> and never sees or sends a key, so every user of the site shares the one server-side key.
+
 ## Run
 
 ### Web app (default)
@@ -64,9 +67,28 @@ Reads every PDF/DOCX in `resumes/` and prints the top N candidates.
 
 ## API
 
+All endpoints are keyless for the client — authentication with Groq happens server-side only.
+
 | Method | Path                 | Description                                  |
 |--------|----------------------|----------------------------------------------|
 | GET    | `/api/health`        | Liveness check                               |
 | GET    | `/api/default-top-n` | Default N value                              |
 | POST   | `/api/evaluate`      | `multipart/form-data`: `files`, `job_description?`, `top_n` |
 | POST   | `/api/job-description` | `multipart/form-data`: `file` (PDF/DOCX) → extracted text |
+
+## Deploying
+
+The site is designed for many HR users to share **your** key:
+
+1. Set `GROQ_API_KEY` as an environment variable on your host (Render, Railway, a VPS, etc.).
+   Do **not** commit `.env` — it is gitignored and must stay off the repo.
+2. Start the server: `uvicorn backend.app:app --host 0.0.0.0 --port 8000`
+3. Share the URL. Visitors only interact with the web page; all Groq calls are made by the
+   server with the key from its environment, and the key is never sent to the browser.
+
+For example, on a Linux host:
+
+```bash
+export GROQ_API_KEY=gsk_...
+uvicorn backend.app:app --host 0.0.0.0 --port 8000
+```
