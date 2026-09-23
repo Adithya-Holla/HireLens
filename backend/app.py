@@ -6,8 +6,11 @@ from fastapi.staticfiles import StaticFiles
 from .config import DEFAULT_TOP_N, PROJECT_ROOT
 from .file_readers import read_resume_bytes
 from .pipeline import evaluate_candidates
+from .rate_limit import rate_limit_middleware
 
 app = FastAPI(title="HireLens API", version="1.0.0")
+
+app.middleware("http")(rate_limit_middleware)
 
 SUPPORTED_EXTENSIONS = {".pdf", ".docx"}
 

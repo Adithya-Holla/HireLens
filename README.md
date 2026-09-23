@@ -76,6 +76,22 @@ All endpoints are keyless for the client — authentication with Groq happens se
 | POST   | `/api/evaluate`      | `multipart/form-data`: `files`, `job_description?`, `top_n` |
 | POST   | `/api/job-description` | `multipart/form-data`: `file` (PDF/DOCX) → extracted text |
 
+## Rate limiting
+
+Requests are limited per client IP with a sliding window (`backend/rate_limit.py`):
+
+| Endpoint               | Default limit                | Env var override            |
+|------------------------|------------------------------|-----------------------------|
+| `/api/evaluate`        | 10 requests / hour           | `RATE_LIMIT_EVALUATE_PER_HOUR` |
+| `/api/job-description` | 30 requests / hour           | `RATE_LIMIT_JD_PER_HOUR`    |
+| other `/api/*`         | 60 requests / minute         | `RATE_LIMIT_DEFAULT_PER_MINUTE` |
+
+Exceeding a limit returns HTTP 429 with a `Retry-After` header. The client IP is taken
+from `X-Forwarded-For` when present (correct behind Render/Railway/nginx), otherwise from
+the socket address. Limits are counted **before** any LLM call, so rejected requests cost
+nothing. Note the counter is in memory — it resets on restart and is per-process (if you
+later scale to multiple workers/instances, use a shared store like Redis).
+
 ## Deploying
 
 The site is designed for many HR users to share **your** key:

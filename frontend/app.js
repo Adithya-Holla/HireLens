@@ -151,7 +151,11 @@ async function evaluate() {
     const response = await fetch("/api/evaluate", { method: "POST", body: form });
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.detail || "Evaluation failed");
+      const retryAfter = response.headers.get("Retry-After");
+      const suffix = response.status === 429 && retryAfter
+        ? ` (wait ${retryAfter}s)`
+        : "";
+      throw new Error((data.detail || "Evaluation failed") + suffix);
     }
 
     resultsEl.innerHTML = "";
