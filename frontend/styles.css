@@ -670,6 +670,19 @@ input[type="number"] {
 .errors {
   color: var(--bad);
   font-size: 0.9rem;
+  font-weight: 500;
+  margin: 1.2rem 0 0.4rem;
+}
+
+.error-line {
+  color: var(--txt-600);
+  font-size: 0.88rem;
+  padding: 0.25rem 0;
+  overflow-wrap: anywhere;
+}
+
+.error-line::first-line {
+  color: var(--bad);
 }
 
 /* ── Footer ────────────────────────────────────────── */

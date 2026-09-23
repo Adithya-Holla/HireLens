@@ -170,10 +170,16 @@ async function evaluate() {
     data.top_candidates.forEach((c) => resultsEl.appendChild(renderCandidate(c)));
 
     if (data.errors && data.errors.length) {
-      const err = document.createElement("p");
-      err.className = "errors";
-      err.textContent = "Failed: " + data.errors.map((e) => e.name).join(", ");
-      resultsEl.appendChild(err);
+      const errHead = document.createElement("p");
+      errHead.className = "errors";
+      errHead.textContent = `Not evaluated (${data.errors.length}):`;
+      resultsEl.appendChild(errHead);
+      data.errors.forEach((e) => {
+        const line = document.createElement("div");
+        line.className = "error-line";
+        line.textContent = `✗ ${e.name} — ${e.error}`;
+        resultsEl.appendChild(line);
+      });
     }
 
     resultsCard.hidden = false;

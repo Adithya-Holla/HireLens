@@ -99,21 +99,43 @@ async def evaluate(
         )
 
     resumes: list[tuple[str, str]] = []
-    rejected: list[str] = []
+    upload_errors: list[dict] = []
 
     for upload in files:
-        suffix = Path(upload.filename or "").suffix.lower()
+        name = upload.filename or "unknown"
+        suffix = Path(name).suffix.lower()
         if suffix not in SUPPORTED_EXTENSIONS:
-            rejected.append(upload.filename or "unknown")
+            upload_errors.append({
+                "name": name,
+                "error": "Unsupported file format — PDF or DOCX only",
+            })
             continue
-        data = await _read_upload(upload)
         try:
-            resumes.append((upload.filename, read_resume_bytes(upload.filename, data)))
+            data = await _read_upload(upload)
+            text = read_resume_bytes(name, data)
+        except HTTPException as e:
+            upload_errors.append({"name": name, "error": str(e.detail)})
+            continue
         except Exception as e:
-            rejected.append(f"{upload.filename} ({e})")
+            upload_errors.append({"name": name, "error": f"Could not read file: {e}"})
+            continue
+        if not text.strip():
+            upload_errors.append({
+                "name": name,
+                "error": "No extractable text — the PDF is likely a scanned image",
+            })
+            continue
+        resumes.append((name, text))
 
     if not resumes:
-        raise HTTPException(status_code=422, detail="No valid PDF/DOCX resumes uploaded")
+        # Nothing readable: return 200 with per-file reasons so the UI can
+        # show exactly why each upload failed.
+        return {
+            "top_candidates": [],
+            "all_results": [],
+            "errors": upload_errors,
+            "total_evaluated": 0,
+        }
 
     # LLM calls + rate-limit sleeps are blocking; run them off the event loop so
     # one slow evaluation can't freeze the site for everyone else.
@@ -127,7 +149,7 @@ async def evaluate(
     return {
         "top_candidates": top,
         "all_results": all_results,
-        "errors": errors + [{"name": name, "error": "Unsupported file format"} for name in rejected],
+        "errors": errors + upload_errors,
         "total_evaluated": len(all_results),
     }
 
