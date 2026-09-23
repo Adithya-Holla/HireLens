@@ -69,3 +69,4 @@ Reads every PDF/DOCX in `resumes/` and prints the top N candidates.
 | GET    | `/api/health`        | Liveness check                               |
 | GET    | `/api/default-top-n` | Default N value                              |
 | POST   | `/api/evaluate`      | `multipart/form-data`: `files`, `job_description?`, `top_n` |
+| POST   | `/api/job-description` | `multipart/form-data`: `file` (PDF/DOCX) → extracted text |

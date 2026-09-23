@@ -16,6 +16,33 @@ fetch("/api/default-top-n")
   })
   .catch(() => {});
 
+const jdFileInput = document.getElementById("jdFile");
+const jdFileName = document.getElementById("jdFileName");
+
+jdFileInput.addEventListener("change", async () => {
+  const file = jdFileInput.files[0];
+  if (!file) return;
+
+  const form = new FormData();
+  form.append("file", file);
+
+  setStatus(`Extracting text from ${file.name}...`);
+  try {
+    const response = await fetch("/api/job-description", { method: "POST", body: form });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.detail || "Could not read the file");
+
+    jobDescriptionEl.value = data.job_description;
+    jdFileName.textContent = `✓ ${data.file_name}`;
+    setStatus("Job description loaded — edit it below if needed.");
+  } catch (err) {
+    jdFileName.textContent = "";
+    setStatus(err.message, true);
+  } finally {
+    jdFileInput.value = "";
+  }
+});
+
 function renderFileList() {
   fileList.innerHTML = "";
   for (const file of fileInput.files) {

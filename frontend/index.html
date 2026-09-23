@@ -16,6 +16,12 @@
     <section class="card">
       <h2>1. Job Description</h2>
       <textarea id="jobDescription" rows="8" placeholder="Paste a job description here... (leave empty to use the built-in default)"></textarea>
+      <div class="jd-or">
+        <span>or upload a JD file instead</span>
+        <label class="file-btn" for="jdFile">Choose PDF / DOC</label>
+        <input type="file" id="jdFile" accept=".pdf,.docx" hidden />
+        <span id="jdFileName" class="jd-file-name"></span>
+      </div>
     </section>
 
     <section class="card">

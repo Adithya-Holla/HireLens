@@ -81,6 +81,37 @@ input[type="number"]:focus {
   border-color: var(--accent);
 }
 
+.jd-or {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.file-btn {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  color: var(--text);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.file-btn:hover {
+  border-color: var(--accent);
+  background: rgba(79, 140, 255, 0.08);
+}
+
+.jd-file-name {
+  color: var(--good);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 40%;
+}
+
 #dropZone {
   display: block;
   border: 2px dashed var(--border);

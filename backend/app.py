@@ -22,6 +22,24 @@ def default_top_n() -> dict:
     return {"top_n": DEFAULT_TOP_N}
 
 
+@app.post("/api/job-description")
+async def upload_job_description(file: UploadFile = File(...)) -> dict:
+    suffix = Path(file.filename or "").suffix.lower()
+    if suffix not in SUPPORTED_EXTENSIONS:
+        raise HTTPException(status_code=422, detail="Only PDF and DOCX job descriptions are supported")
+
+    data = await file.read()
+    try:
+        text = read_resume_bytes(file.filename, data).strip()
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"Could not read {file.filename}: {e}")
+
+    if not text:
+        raise HTTPException(status_code=422, detail=f"No text could be extracted from {file.filename}")
+
+    return {"job_description": text, "file_name": file.filename}
+
+
 @app.post("/api/evaluate")
 async def evaluate(
     files: list[UploadFile] = File(...),
