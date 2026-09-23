@@ -2,17 +2,47 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 
-from .config import DEFAULT_TOP_N, PROJECT_ROOT
+from .config import (
+    DEFAULT_TOP_N,
+    MAX_FILES_PER_REQUEST,
+    MAX_JD_CHARS,
+    MAX_UPLOAD_BYTES,
+    PROJECT_ROOT,
+)
 from .file_readers import read_resume_bytes
 from .pipeline import evaluate_candidates
 from .rate_limit import rate_limit_middleware
 
-app = FastAPI(title="HireLens API", version="1.0.0")
+app = FastAPI(
+    title="HireLens API",
+    version="1.0.0",
+    # The public API is documented in README.md; keep schema/docs off the public site.
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+)
 
 app.middleware("http")(rate_limit_middleware)
 
 SUPPORTED_EXTENSIONS = {".pdf", ".docx"}
+
+
+def _too_large(file_name: str) -> HTTPException:
+    limit_mb = MAX_UPLOAD_BYTES // (1024 * 1024)
+    return HTTPException(
+        status_code=413,
+        detail=f"{file_name} is larger than the {limit_mb} MB limit",
+    )
+
+
+async def _read_upload(upload: UploadFile) -> bytes:
+    """Read an upload while enforcing the size cap (never buffer unbounded data)."""
+    data = await upload.read(MAX_UPLOAD_BYTES + 1)
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise _too_large(upload.filename or "file")
+    return data
 
 
 @app.get("/api/health")
@@ -31,7 +61,7 @@ async def upload_job_description(file: UploadFile = File(...)) -> dict:
     if suffix not in SUPPORTED_EXTENSIONS:
         raise HTTPException(status_code=422, detail="Only PDF and DOCX job descriptions are supported")
 
-    data = await file.read()
+    data = await _read_upload(file)
     try:
         text = read_resume_bytes(file.filename, data).strip()
     except Exception as e:
@@ -39,6 +69,9 @@ async def upload_job_description(file: UploadFile = File(...)) -> dict:
 
     if not text:
         raise HTTPException(status_code=422, detail=f"No text could be extracted from {file.filename}")
+
+    if len(text) > MAX_JD_CHARS:
+        text = text[:MAX_JD_CHARS]
 
     return {"job_description": text, "file_name": file.filename}
 
@@ -52,6 +85,19 @@ async def evaluate(
     if top_n < 1:
         raise HTTPException(status_code=422, detail="top_n must be a positive integer")
 
+    if len(files) > MAX_FILES_PER_REQUEST:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Too many files: send at most {MAX_FILES_PER_REQUEST} per request",
+        )
+
+    job_description = job_description.strip()
+    if len(job_description) > MAX_JD_CHARS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Job description is too long (max {MAX_JD_CHARS} characters)",
+        )
+
     resumes: list[tuple[str, str]] = []
     rejected: list[str] = []
 
@@ -60,7 +106,7 @@ async def evaluate(
         if suffix not in SUPPORTED_EXTENSIONS:
             rejected.append(upload.filename or "unknown")
             continue
-        data = await upload.read()
+        data = await _read_upload(upload)
         try:
             resumes.append((upload.filename, read_resume_bytes(upload.filename, data)))
         except Exception as e:
@@ -69,9 +115,12 @@ async def evaluate(
     if not resumes:
         raise HTTPException(status_code=422, detail="No valid PDF/DOCX resumes uploaded")
 
-    top, all_results, errors = evaluate_candidates(
+    # LLM calls + rate-limit sleeps are blocking; run them off the event loop so
+    # one slow evaluation can't freeze the site for everyone else.
+    top, all_results, errors = await run_in_threadpool(
+        evaluate_candidates,
         resumes=resumes,
-        job_description=job_description.strip(),
+        job_description=job_description,
         top_n=top_n,
     )
 

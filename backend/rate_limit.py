@@ -56,10 +56,16 @@ limiter = SlidingWindowLimiter()
 
 
 def client_key(request: Request) -> str:
-    """Identify the client. Uses X-Forwarded-For when behind a proxy/host."""
+    """Identify the client, correctly behind a reverse proxy.
+
+    The client controls X-Forwarded-For and can prepend fake IPs, but the proxy
+    APPENDS the real source address — so the last entry is the trustworthy one.
+    """
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded:
-        return forwarded.split(",")[0].strip()
+        last = forwarded.split(",")[-1].strip()
+        if last:
+            return last
     return request.client.host if request.client else "unknown"
 
 

@@ -1,8 +1,9 @@
-fastapi
-uvicorn[standard]
-python-multipart
-groq
-python-dotenv
-pydantic
-pypdf
-python-docx
+# Pinned to the versions the app was tested with (2026-09).
+fastapi==0.141.1
+uvicorn[standard]==0.53.0
+python-multipart==0.0.32
+groq==1.7.0
+python-dotenv==1.2.3
+pydantic==2.13.5
+pypdf==6.19.0
+python-docx==1.2.0

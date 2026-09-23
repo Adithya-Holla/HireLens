@@ -138,6 +138,11 @@ async function evaluate() {
     return;
   }
 
+  if (files.length > 20) {
+    setStatus("Please upload at most 20 resumes per evaluation.", true);
+    return;
+  }
+
   const form = new FormData();
   for (const file of files) form.append("files", file);
   form.append("top_n", topN);
@@ -145,7 +150,10 @@ async function evaluate() {
 
   evaluateBtn.disabled = true;
   resultsCard.hidden = true;
-  setStatus(`Evaluating ${files.length} resume(s)... this may take a minute.`);
+  const batchNote = files.length > 8
+    ? ` Large batch — this may take a couple of minutes, please keep this tab open.`
+    : " This may take a minute.";
+  setStatus(`Evaluating ${files.length} resume(s)...${batchNote}`);
 
   try {
     const response = await fetch("/api/evaluate", { method: "POST", body: form });

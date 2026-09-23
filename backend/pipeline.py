@@ -8,6 +8,20 @@ from .models import JobD
 from .reporting import top_candidates
 from .resume_parser import parse_resume
 
+# Parsed JDs are cached by text so repeated runs with the same description
+# skip the job-parsing LLM call.
+_job_cache: dict[str, JobD] = {}
+_JOB_CACHE_MAX = 50
+
+
+def _get_job(job_description: str) -> JobD:
+    text = job_description or JOB_DESCRIPTION
+    if text not in _job_cache:
+        if len(_job_cache) >= _JOB_CACHE_MAX:
+            _job_cache.clear()
+        _job_cache[text] = parse_job_description(text)
+    return _job_cache[text]
+
 
 def evaluate_candidates(
     resumes: list[tuple[str, str]],
@@ -21,7 +35,7 @@ def evaluate_candidates(
     An empty job_description falls back to the built-in default JD.
     Returns (top_n_candidates, all_ranked_results, errors).
     """
-    job: JobD = parse_job_description(job_description or JOB_DESCRIPTION)
+    job = _get_job(job_description)
 
     all_results: list[dict] = []
     errors: list[dict] = []

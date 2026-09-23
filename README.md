@@ -67,14 +67,14 @@ Reads every PDF/DOCX in `resumes/` and prints the top N candidates.
 
 ## API
 
-All endpoints are keyless for the client — authentication with Groq happens server-side only.
+Rate-limited (see below); auth with Groq happens server-side only.
 
 | Method | Path                 | Description                                  |
 |--------|----------------------|----------------------------------------------|
 | GET    | `/api/health`        | Liveness check                               |
 | GET    | `/api/default-top-n` | Default N value                              |
-| POST   | `/api/evaluate`      | `multipart/form-data`: `files`, `job_description?`, `top_n` |
-| POST   | `/api/job-description` | `multipart/form-data`: `file` (PDF/DOCX) → extracted text |
+| POST   | `/api/evaluate`      | `multipart/form-data`: `files` (≤20, ≤10 MB each), `job_description?` (≤20k chars), `top_n` |
+| POST   | `/api/job-description` | `multipart/form-data`: `file` (PDF/DOCX ≤10 MB) → extracted text |
 
 ## Rate limiting
 
@@ -87,10 +87,26 @@ Requests are limited per client IP with a sliding window (`backend/rate_limit.py
 | other `/api/*`         | 60 requests / minute         | `RATE_LIMIT_DEFAULT_PER_MINUTE` |
 
 Exceeding a limit returns HTTP 429 with a `Retry-After` header. The client IP is taken
-from `X-Forwarded-For` when present (correct behind Render/Railway/nginx), otherwise from
-the socket address. Limits are counted **before** any LLM call, so rejected requests cost
-nothing. Note the counter is in memory — it resets on restart and is per-process (if you
-later scale to multiple workers/instances, use a shared store like Redis).
+from the **last** entry of `X-Forwarded-For` — the one appended by your reverse proxy —
+so clients cannot spoof fake IPs to bypass the limits. Limits are counted **before** any
+LLM call, so rejected requests cost nothing. Note the counter is in memory — it resets on
+restart and is per-process (if you later scale to multiple workers/instances, use a
+shared store like Redis).
+
+## Request limits
+
+| Limit                         | Default              | Env var override     |
+|-------------------------------|----------------------|----------------------|
+| Upload size per file          | 10 MB                | `MAX_UPLOAD_MB`      |
+| Files per evaluate request    | 20                   | —                    |
+| Job description length        | 20,000 chars         | —                    |
+| Delay between Groq calls      | 2 s                  | `REQUEST_DELAY_SECONDS` |
+
+All violations return a clear 413/422 before any LLM work happens. The FastAPI schema
+endpoints (`/docs`, `/redoc`, `/openapi.json`) are disabled — the public API is
+documented in this README only.
+
+Evaluation runs in a threadpool, so one slow run never blocks other visitors.
 
 ## Deploying
 

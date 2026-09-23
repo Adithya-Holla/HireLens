@@ -17,9 +17,16 @@ if not API_KEY:
 
 MODEL = "openai/gpt-oss-120b"
 RESUME_FOLDER = PROJECT_ROOT / "resumes"
-REQUEST_DELAY_SECONDS = 5
+
+# Politeness delay between Groq calls (env-overridable; 2s is safe for Groq's limits).
+REQUEST_DELAY_SECONDS = float(os.getenv("REQUEST_DELAY_SECONDS", "2"))
 
 # Fallback number of top candidates when the user just presses Enter at the prompt.
 DEFAULT_TOP_N = 2
+
+# Request limits — protect memory and keep runs inside host request timeouts.
+MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_MB", "10")) * 1024 * 1024
+MAX_FILES_PER_REQUEST = 20
+MAX_JD_CHARS = 20_000
 
 client = Groq(api_key=API_KEY)
