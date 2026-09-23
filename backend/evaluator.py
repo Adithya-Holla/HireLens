@@ -10,10 +10,10 @@ def final_score(job: JobD, resume: Resume) -> MatchResult:
     Compare the candidate's resume with the job description.
 
     JOB DESCRIPTION:
-    {job.model_dump_json(indent=2)}
+    {job.model_dump_json()}
 
     CANDIDATE RESUME:
-    {resume.model_dump_json(indent=2)}
+    {resume.model_dump_json()}
 
     Return a valid JSON object matching this schema:
     {match_schema}

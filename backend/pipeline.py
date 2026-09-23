@@ -1,5 +1,7 @@
 import time
 
+from groq import RateLimitError
+
 from .config import REQUEST_DELAY_SECONDS
 from .evaluator import final_score
 from .job_description import JOB_DESCRIPTION
@@ -54,6 +56,12 @@ def evaluate_candidates(
                 "name": parsed_resume.name,
                 "score": result.score,
                 "details": result.details,
+            })
+        except RateLimitError:
+            errors.append({
+                "name": name,
+                "error": "Still rate-limited by Groq after retries — "
+                         "try a smaller batch or run again in a minute.",
             })
         except Exception as e:
             errors.append({"name": name, "error": str(e)})

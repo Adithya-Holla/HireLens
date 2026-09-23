@@ -202,6 +202,9 @@ this README is the authoritative API reference.
 - **Fault-tolerant parsing** — model output is validated against Pydantic schemas and
   tolerated markdown/JSON inconsistencies; per-candidate failures are reported without
   failing the batch.
+- **Rate-limit resilience** — Groq's tokens-per-minute (429) responses are retried with
+  a 5s/15s/30s backoff, sized to the rolling per-minute window; if the limit persists,
+  only that candidate is marked failed and the batch continues.
 
 *Counters are in-memory and reset on restart. If you scale to multiple instances,
 back the limiter with a shared store such as Redis.*
